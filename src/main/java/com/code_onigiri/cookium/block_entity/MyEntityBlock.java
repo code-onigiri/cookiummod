@@ -1,0 +1,19 @@
+package com.code_onigiri.cookium.block_entity;
+
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.BlockState;
+
+public class MyEntityBlock extends Block implements EntityBlock {
+    public MyEntityBlock(BlockBehaviour.Properties properties) {
+        super(properties);
+    }
+
+    @Override
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+        return new MyBlockEntity(pos, state);
+    }
+}

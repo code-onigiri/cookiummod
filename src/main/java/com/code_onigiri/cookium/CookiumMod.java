@@ -1,5 +1,8 @@
 package com.code_onigiri.cookium;
 
+import com.code_onigiri.cookium.block_entity.MyBlockEntity;
+import com.code_onigiri.cookium.block_entity.MyEntityBlock;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import org.slf4j.Logger;
 
 import com.mojang.logging.LogUtils;
@@ -31,6 +34,8 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
+import java.util.function.Supplier;
+
 // The value here should match an entry in the META-INF/neoforge.mods.toml file
 @Mod(CookiumMod.MODID)
 public class CookiumMod {
@@ -54,6 +59,13 @@ public class CookiumMod {
     public static final DeferredItem<Item> EXAMPLE_ITEM = ITEMS.registerSimpleItem("example_item", p -> p.food(new FoodProperties.Builder()
             .alwaysEdible().nutrition(1).saturationModifier(2f).build()));
 
+    public static final DeferredBlock<MyEntityBlock> MY_ENTITY_BLOCK = BLOCKS.register(
+            "my_entity_block",
+            () -> new MyEntityBlock(
+                    BlockBehaviour.Properties.of()
+            )
+    );
+
     // Creates a creative tab with the id "cookiummod:example_tab" for the example item, that is placed after the combat tab
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> EXAMPLE_TAB = CREATIVE_MODE_TABS.register("example_tab", () -> CreativeModeTab.builder()
             .title(Component.translatable("itemGroup.cookiummod")) //The language key for the title of your CreativeModeTab
@@ -62,6 +74,18 @@ public class CookiumMod {
             .displayItems((parameters, output) -> {
                 output.accept(EXAMPLE_ITEM.get()); // Add the example item to the tab. For your own tabs, this method is preferred over the event
             }).build());
+
+
+    public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITY_TYPES = DeferredRegister.create(Registries.BLOCK_ENTITY_TYPE, MODID);
+
+    public static final Supplier<BlockEntityType<MyBlockEntity>> MY_BLOCK_ENTITY = BLOCK_ENTITY_TYPES.register(
+            "my_block_entity",
+            () -> new BlockEntityType<>(
+                    MyBlockEntity::new,
+                    false,
+                    MY_ENTITY_BLOCK.get()
+            )
+    );
 
     // The constructor for the mod class is the first code that is run when your mod is loaded.
     // FML will recognize some parameter types like IEventBus or ModContainer and pass them in automatically.
@@ -75,6 +99,8 @@ public class CookiumMod {
         ITEMS.register(modEventBus);
         // Register the Deferred Register to the mod event bus so tabs get registered
         CREATIVE_MODE_TABS.register(modEventBus);
+
+        BLOCK_ENTITY_TYPES.register(modEventBus);
 
         // Register ourselves for server and other game events we are interested in.
         // Note that this is necessary if and only if we want *this* class (CookiumMod) to respond directly to events.

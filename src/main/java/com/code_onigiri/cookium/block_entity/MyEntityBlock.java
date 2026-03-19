@@ -10,6 +10,8 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 
+import javax.annotation.Nullable;
+
 import static com.code_onigiri.cookium.CookiumMod.MY_BLOCK_ENTITY;
 
 public class MyEntityBlock extends Block implements EntityBlock {
@@ -22,10 +24,15 @@ public class MyEntityBlock extends Block implements EntityBlock {
         return new MyBlockEntity(pos, state);
     }
 
+    private static <E extends BlockEntity, A extends BlockEntity> @Nullable BlockEntityTicker<A> createTickerHelper(
+            BlockEntityType<A> type, BlockEntityType<E> checkedType, BlockEntityTicker<? super E> ticker
+    ) {
+        return checkedType == type ? (BlockEntityTicker<A>) ticker : null;
+    }
+
     @SuppressWarnings("unchecked")
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
-
-        return type == MY_BLOCK_ENTITY.get() ? (BlockEntityTicker<T>) MyBlockEntity::tick : null;
+        return createTickerHelper(type, MY_BLOCK_ENTITY.get(), MyBlockEntity::tick);
     }
 }

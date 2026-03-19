@@ -75,6 +75,9 @@ public class CookiumMod {
             )
     );
 
+    public static final DeferredItem<BlockItem> MY_BLOCK_ENTITY_ITEM = ITEMS.registerSimpleBlockItem(MY_ENTITY_BLOCK);
+
+
     // The constructor for the mod class is the first code that is run when your mod is loaded.
     // FML will recognize some parameter types like IEventBus or ModContainer and pass them in automatically.
     public CookiumMod(IEventBus modEventBus, ModContainer modContainer) {

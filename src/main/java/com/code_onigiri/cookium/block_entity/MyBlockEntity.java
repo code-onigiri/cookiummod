@@ -14,6 +14,6 @@ public class MyBlockEntity extends BlockEntity {
         super(MY_BLOCK_ENTITY.get(), pos, state);
     }
 
-    public static <T extends BlockEntity> void tick(Level level, BlockPos blockPos, BlockState blockState, T t) {
+    public static void tick(Level level, BlockPos blockPos, BlockState blockState, MyBlockEntity blockEntity) {
     }
 }

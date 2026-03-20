@@ -1,5 +1,7 @@
 package com.code_onigiri.cookium;
 
+import com.code_onigiri.cookium.block_entity.MyBlockMenu;
+import com.code_onigiri.cookium.block_entity.MyBlockScreen;
 import net.minecraft.client.Minecraft;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -7,6 +9,7 @@ import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
+import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.neoforge.client.gui.ConfigurationScreen;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 
@@ -27,5 +30,10 @@ public class CookiumModClient {
         // Some client setup code
         CookiumMod.LOGGER.info("HELLO FROM CLIENT SETUP");
         CookiumMod.LOGGER.info("MINECRAFT NAME >> {}", Minecraft.getInstance().getUser().getName());
+    }
+
+    @SubscribeEvent
+    static void registerMenuScreens(RegisterMenuScreensEvent event) {
+        event.register(CookiumMod.MY_MENU.get(), MyBlockScreen::new);
     }
 }

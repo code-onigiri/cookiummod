@@ -1,43 +1,31 @@
 package com.code_onigiri.cookium.block_entity;
 
+import com.code_onigiri.cookium.CookiumMod;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Registry;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.neoforge.transfer.IndexModifier;
 import net.neoforged.neoforge.transfer.item.ItemResource;
 import net.neoforged.neoforge.transfer.item.ResourceHandlerSlot;
 import org.jspecify.annotations.Nullable;
 
-import java.util.function.Supplier;
 public class MyBlockMenu extends AbstractContainerMenu {
-
-    public static final MenuType<MyBlockMenu> MY_MENU = new MenuType<>(MyBlockMenu::new, FeatureFlags.DEFAULT_FLAGS);
 
     private final MyBlockEntity blockEntity;
     private final BlockPos pos;
 
-    @SubscribeEvent
-    public void registerMenuScreens(RegisterMenuScreensEvent event) {
-        event.register(MyBlockMenu.MY_MENU, MyBlockScreen::new);
-    }
-
-    protected MyBlockMenu(int containerId, Inventory playerInventory) {
+    public MyBlockMenu(int containerId, Inventory playerInventory) {
         this(containerId, playerInventory, BlockPos.ZERO);
     }
 
     public MyBlockMenu(int containerId, Inventory playerInventory, BlockPos pos) {
-        super(MY_MENU, containerId);
+        super(CookiumMod.MY_MENU.get(), containerId);
         this.pos = pos;
 
-        if (playerInventory.player.level().getBlockEntity(pos) instanceof MyBlockEntity be) {
+        if (playerInventory.player.level() != null && playerInventory.player.level().getBlockEntity(pos) instanceof MyBlockEntity be) {
             this.blockEntity = be;
             var handler = be.getItemHandler();
             for (int i = 0; i < 9; i++) {
@@ -45,14 +33,6 @@ public class MyBlockMenu extends AbstractContainerMenu {
             }
         } else {
             this.blockEntity = null;
-        }
-
-        // ブロックエンティティを取得して保存
-        if (playerInventory.player.level().getBlockEntity(pos) instanceof MyBlockEntity be) {
-            var handler = be.getItemHandler();
-            for (int i = 0; i < 9; i++) {
-                this.addSlot(new ResourceHandlerSlot(handler, (IndexModifier<ItemResource>) handler, i, 8 + i * 18, 20));
-            }
         }
 
         // プレイヤーインベントリスロット

@@ -5,6 +5,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -19,14 +20,16 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.ResourceHandlerUtil;
 import net.neoforged.neoforge.transfer.item.ItemResource;
 import net.neoforged.neoforge.transfer.item.ItemStacksResourceHandler;
 import net.neoforged.neoforge.transfer.transaction.Transaction;
+import org.jspecify.annotations.Nullable;
 
 import static com.code_onigiri.cookium.CookiumMod.MY_BLOCK_ENTITY;
 
 
-public class MyBlockEntity extends BlockEntity {
+public class MyBlockEntity extends BlockEntity implements MenuProvider {
     protected final ItemStacksResourceHandler itemHandler = new ItemStacksResourceHandler(9);
 
     public MyBlockEntity(BlockPos pos, BlockState state) {
@@ -78,20 +81,21 @@ public class MyBlockEntity extends BlockEntity {
 
         if (sourceHandler != null && targetHandler != null){
             try (Transaction tx = Transaction.openRoot()){
-                for (int i = 0; i < sourceHandler.size(); i++){
-                    var resource = sourceHandler.getResource(i);
-                    if (!resource.isEmpty()){
-                        int extracted = sourceHandler.extract(i, resource, 64, tx);
-                        int inserted = targetHandler.insert(resource, extracted, tx);
-                        if (extracted == inserted) {
-                            tx.commit();
-                            return;
-                        }
-                    }
+                int moved = ResourceHandlerUtil.move(sourceHandler,targetHandler,fr -> !fr.isEmpty(),1,tx);
+                if (moved > 0){
+                    tx.commit();
                 }
             }
         }
     }
 
+    @Override
+    public Component getDisplayName() {
+        return Component.literal("My Block");
+    }
 
+    @Override
+    public @Nullable AbstractContainerMenu createMenu(int i, Inventory inventory, Player player) {
+        return new MyBlockMenu(i, inventory, this.worldPosition);
+    }
 }

@@ -2,6 +2,7 @@ package com.code_onigiri.cookium;
 
 import com.code_onigiri.cookium.block_entity.MyBlockEntity;
 import com.code_onigiri.cookium.block_entity.MyEntityBlock;
+import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import org.slf4j.Logger;
 
@@ -10,6 +11,7 @@ import com.mojang.logging.LogUtils;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
@@ -75,6 +77,13 @@ public class CookiumMod {
             )
     );
 
+    public static final DeferredRegister<MenuType<?>> MENU_TYPES = DeferredRegister.create(Registries.MENU, MODID);
+
+    public static final Supplier<MenuType<com.code_onigiri.cookium.block_entity.MyBlockMenu>> MY_MENU = MENU_TYPES.register(
+            "my_menu",
+            () -> new MenuType<>(com.code_onigiri.cookium.block_entity.MyBlockMenu::new, FeatureFlags.DEFAULT_FLAGS)
+    );
+
     public static final DeferredItem<BlockItem> MY_BLOCK_ENTITY_ITEM = ITEMS.registerSimpleBlockItem(MY_ENTITY_BLOCK);
 
 
@@ -92,6 +101,7 @@ public class CookiumMod {
         CREATIVE_MODE_TABS.register(modEventBus);
 
         BLOCK_ENTITY_TYPES.register(modEventBus);
+        MENU_TYPES.register(modEventBus);
 
         // Register ourselves for server and other game events we are interested in.
         // Note that this is necessary if and only if we want *this* class (CookiumMod) to respond directly to events.

@@ -1,7 +1,7 @@
 package com.code_onigiri.cookium;
 
-import com.code_onigiri.cookium.block_entity.MyBlockMenu;
-import com.code_onigiri.cookium.block_entity.MyBlockScreen;
+import com.code_onigiri.cookium.block_entity.biggerchest.BiggerChestScreen;
+import com.code_onigiri.cookium.block_entity.myblock.MyBlockScreen;
 import net.minecraft.client.Minecraft;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -35,5 +35,6 @@ public class CookiumModClient {
     @SubscribeEvent
     static void registerMenuScreens(RegisterMenuScreensEvent event) {
         event.register(CookiumMod.MY_MENU.get(), MyBlockScreen::new);
+        event.register(CookiumMod.BIGGER_CHEST_MENU.get(), BiggerChestScreen::new);
     }
 }

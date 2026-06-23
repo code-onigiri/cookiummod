@@ -1,7 +1,16 @@
 package com.code_onigiri.cookium;
 
-import com.code_onigiri.cookium.block_entity.MyBlockEntity;
-import com.code_onigiri.cookium.block_entity.MyEntityBlock;
+import com.code_onigiri.cookium.block_entity.biggerchest.BiggerChestBE;
+import com.code_onigiri.cookium.block_entity.biggerchest.BiggerChestBlock;
+import com.code_onigiri.cookium.block_entity.biggerchest.BiggerChestMenu;
+import com.code_onigiri.cookium.block_entity.myblock.MyBlockEntity;
+import com.code_onigiri.cookium.block_entity.myblock.MyBlockMenu;
+import com.code_onigiri.cookium.block_entity.myblock.MyEntityBlock;
+import com.code_onigiri.cookium.entity.ModEntities;
+import com.code_onigiri.cookium.entity.ModEntityEvents;
+import com.code_onigiri.cookium.item.ModItems;
+import com.code_onigiri.cookium.recipe.ModRecipeSerializers;
+import com.code_onigiri.cookium.recipe.ModRecipeTypes;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import org.slf4j.Logger;
@@ -12,16 +21,10 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.flag.FeatureFlags;
-import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.CreativeModeTabs;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.state.BlockBehaviour;
-import net.minecraft.world.level.material.MapColor;
-import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.Mod;
@@ -29,12 +32,12 @@ import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
+import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 
 import java.util.function.Supplier;
 
@@ -57,12 +60,39 @@ public class CookiumMod {
             MyEntityBlock::new
     );
 
-    // Creates a creative tab with the id "cookiummod:example_tab" for the example item, that is placed after the combat tab
+    public static final DeferredBlock<BiggerChestBlock> BIGGER_CHEST_BLOCK = BLOCKS.registerBlock(
+            "bigger_chest_block",
+            BiggerChestBlock::new
+    );
+
+    public static final DeferredItem<BlockItem> MY_BLOCK_ENTITY_ITEM = ITEMS.registerSimpleBlockItem(MY_ENTITY_BLOCK);
+    public static final DeferredItem<BlockItem> BIGGER_CHEST_BLOCK_ITEM = ITEMS.registerSimpleBlockItem(BIGGER_CHEST_BLOCK);
+
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> EXAMPLE_TAB = CREATIVE_MODE_TABS.register("example_tab", () -> CreativeModeTab.builder()
-            .title(Component.translatable("itemGroup.cookiummod")) //The language key for the title of your CreativeModeTab
+            .title(Component.translatable("itemGroup.cookiummod"))
             .withTabsBefore(CreativeModeTabs.COMBAT)
+            .icon(() -> ModItems.COOKIUM_INGOT.get().getDefaultInstance())
             .displayItems((parameters, output) -> {
-                 // Add the example item to the tab. For your own tabs, this method is preferred over the event
+                output.accept(MY_BLOCK_ENTITY_ITEM);
+                output.accept(BIGGER_CHEST_BLOCK_ITEM);
+                output.accept(ModItems.COOKIUM_INGOT);
+                output.accept(ModItems.COOKIUM_NUGGET);
+                output.accept(ModItems.COOKIUM_CORE);
+                output.accept(ModItems.COOKIUM_APPLE);
+                output.accept(ModItems.COOKIUM_BERRY);
+                output.accept(ModItems.GOLDEN_COOKIUM_APPLE);
+                output.accept(ModItems.COOKIUM_SWORD);
+                output.accept(ModItems.COOKIUM_PICKAXE);
+                output.accept(ModItems.COOKIUM_AXE);
+                output.accept(ModItems.COOKIUM_SHOVEL);
+                output.accept(ModItems.COOKIUM_HOE);
+                output.accept(ModItems.COOKIUM_HELMET);
+                output.accept(ModItems.COOKIUM_CHESTPLATE);
+                output.accept(ModItems.COOKIUM_LEGGINGS);
+                output.accept(ModItems.COOKIUM_BOOTS);
+                output.accept(ModItems.COOKIUM_DAGGER);
+                output.accept(ModItems.COOKIUM_BOTTLE);
+                output.accept(ModItems.COOKIUM_PEARL);
             }).build());
 
 
@@ -77,46 +107,52 @@ public class CookiumMod {
             )
     );
 
-    public static final DeferredRegister<MenuType<?>> MENU_TYPES = DeferredRegister.create(Registries.MENU, MODID);
-
-    public static final Supplier<MenuType<com.code_onigiri.cookium.block_entity.MyBlockMenu>> MY_MENU = MENU_TYPES.register(
-            "my_menu",
-            () -> new MenuType<>(com.code_onigiri.cookium.block_entity.MyBlockMenu::new, FeatureFlags.DEFAULT_FLAGS)
+    public static final Supplier<BlockEntityType<BiggerChestBE>> BIGGER_CHEST_BE = BLOCK_ENTITY_TYPES.register(
+            "bigger_chest_be",
+            () -> new BlockEntityType<>(
+                    BiggerChestBE::new,
+                    false,
+                    BIGGER_CHEST_BLOCK.get()
+            )
     );
 
-    public static final DeferredItem<BlockItem> MY_BLOCK_ENTITY_ITEM = ITEMS.registerSimpleBlockItem(MY_ENTITY_BLOCK);
+    public static final DeferredRegister<MenuType<?>> MENU_TYPES = DeferredRegister.create(Registries.MENU, MODID);
+
+    public static final Supplier<MenuType<MyBlockMenu>> MY_MENU = MENU_TYPES.register(
+            "my_menu",
+            () -> new MenuType<>(MyBlockMenu::new, FeatureFlags.VANILLA_SET)
+    );
+
+    public static final Supplier<MenuType<BiggerChestMenu>> BIGGER_CHEST_MENU = MENU_TYPES.register(
+            "bigger_chest_menu",
+            () -> new MenuType<>(BiggerChestMenu::new, FeatureFlags.VANILLA_SET)
+    );
 
 
-    // The constructor for the mod class is the first code that is run when your mod is loaded.
-    // FML will recognize some parameter types like IEventBus or ModContainer and pass them in automatically.
     public CookiumMod(IEventBus modEventBus, ModContainer modContainer) {
-        // Register the commonSetup method for modloading
+        modEventBus.addListener(RegisterCapabilitiesEvent.class, MyBlockEntity::registerCapabilities);
+        modEventBus.addListener(RegisterCapabilitiesEvent.class, BiggerChestBE::registerCapabilities);
+
         modEventBus.addListener(this::commonSetup);
 
-        // Register the Deferred Register to the mod event bus so blocks get registered
         BLOCKS.register(modEventBus);
-        // Register the Deferred Register to the mod event bus so items get registered
         ITEMS.register(modEventBus);
-        // Register the Deferred Register to the mod event bus so tabs get registered
+        ModItems.ITEMS.register(modEventBus);
         CREATIVE_MODE_TABS.register(modEventBus);
 
         BLOCK_ENTITY_TYPES.register(modEventBus);
         MENU_TYPES.register(modEventBus);
+        ModEntities.ENTITY_TYPES.register(modEventBus);
+        ModEntityEvents.register(modEventBus);
+        ModRecipeTypes.RECIPE_TYPES.register(modEventBus);
+        ModRecipeSerializers.RECIPE_SERIALIZERS.register(modEventBus);
 
-        // Register ourselves for server and other game events we are interested in.
-        // Note that this is necessary if and only if we want *this* class (CookiumMod) to respond directly to events.
-        // Do not add this line if there are no @SubscribeEvent-annotated functions in this class, like onServerStarting() below.
         NeoForge.EVENT_BUS.register(this);
 
-        // Register the item to a creative tab
-//        modEventBus.addListener(this::addCreative);
-
-        // Register our mod's ModConfigSpec so that FML can create and load the config file for us
         modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
     }
 
     private void commonSetup(FMLCommonSetupEvent event) {
-        // Some common setup code
         LOGGER.info("HELLO FROM COMMON SETUP");
 
         if (Config.LOG_DIRT_BLOCK.getAsBoolean()) {

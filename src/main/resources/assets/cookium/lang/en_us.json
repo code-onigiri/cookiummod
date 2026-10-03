@@ -1,0 +1,13 @@
+{
+  "itemGroup.cookium": "Example Mod Tab",
+  "block.cookium.example_block": "Example Block",
+  "item.cookium.example_item": "Example Item",
+
+  "cookium.configuration.title": "cookium Configs",
+  "cookium.configuration.section.cookium.common.toml": "cookium Configs",
+  "cookium.configuration.section.cookium.common.toml.title": "cookium Configs",
+  "cookium.configuration.items": "Item List",
+  "cookium.configuration.logDirtBlock": "Log Dirt Block",
+  "cookium.configuration.magicNumberIntroduction": "Magic Number Text",
+  "cookium.configuration.magicNumber": "Magic Number"
+}
